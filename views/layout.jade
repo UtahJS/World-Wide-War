@@ -3,4 +3,11 @@ html
   head
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
+    script(src='/nowjs/now.js', type='text/javascript')
+    
+    script(type='text/javascript')
+        now.ready(function(){
+            now.logStuff("Hello World!");
+        });
+        
   body!= body

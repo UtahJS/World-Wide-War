@@ -38,4 +38,7 @@ app.get('/', function(req, res){
 app.listen(3000);
 everyone = require('now').initialize(app);
 
+everyone.now.logStuff = function(msg){
+    console.log(msg);
+}
 console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
