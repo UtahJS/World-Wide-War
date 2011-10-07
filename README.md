@@ -2,7 +2,8 @@
 
 ##Kip - war.utahjs.com - post hook deploy
 
-##client
+
+## CLIENT
 
 ###artwork
 
@@ -11,9 +12,19 @@
 ###paint bullet
 ###paint mini-map
 
-user input: aim & fire & move
+### user input: aim & fire & move
+* accept input
 
-##node 
+### Debug Box Info
+* How many people are connected
+* Total tanks; bullets in world
+
+### Basic CAAT framework with a scene for the game
+* Show a starting scene.  wait for user input. switch to "game scene"
+
+
+
+## NODE
 
 ###build world
 
@@ -30,6 +41,8 @@ user input: aim & fire & move
 ###send data to clients
 
 ###user / player
+* Determine how to get input from user (left/right arrow keys to move; up/down arrows to aim; space down to start shoot -- show power meter; space up to fire)
+* pass events to server
 
 ### by UtahJS Group
 
