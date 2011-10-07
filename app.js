@@ -1,10 +1,10 @@
-
 /**
  * Module dependencies.
  */
 
 var express = require('express')
-  , everyone;
+  , everyone
+  , example = require('./lib/example');
 
 var app = module.exports = express.createServer();
 
@@ -33,6 +33,8 @@ app.get('/', function(req, res){
   res.render('index', {
     title: 'Express'
   });
+  
+  example.exampleMethod();
 });
 
 app.listen(3000);
