@@ -54,5 +54,12 @@
 * User can control the tank that has focus
 
 
+## Code Layout, Design and Architecture 
+* Everything starts in "views/index.jade"
+** If you need more files (like new .js files) includes, include them in via this file
+* The actual client side starts up in "public/js/startup.js"
+** See the function near the bottom that does: window.addEventListener -- it creates the "Splash Screen"; and redirects to a function called "createScenes" (in same file)
+
+
 ## by UtahJS Group
 
