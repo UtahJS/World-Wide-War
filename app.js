@@ -4,7 +4,9 @@
 
 var express = require('express')
   , everyone
-  , example = require('./lib/example');
+  , example = require('./lib/example')
+  , map = require('./lib/map')
+  ;
 
 var app = module.exports = express.createServer();
 
@@ -27,6 +29,7 @@ app.configure('production', function(){
   app.use(express.errorHandler()); 
 });
 
+map.buildMap();
 // Routes
 
 app.get('/', function(req, res){
@@ -40,7 +43,15 @@ app.get('/', function(req, res){
 app.listen(3000);
 everyone = require('now').initialize(app);
 
+// initialize + configuration
+
+// *** PUBLISH TO CLIENT: 
 everyone.now.logStuff = function(msg){
     console.log(msg);
 }
+
+// *** PUBLISH TO CLIENT: "The Map Data"
+everyone.now.mapData = map.mapData;
+
+
 console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
