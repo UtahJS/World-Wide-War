@@ -1,6 +1,14 @@
 
     (function() {
 
+        var MS_SHOW_SPLASH_SCREEN = 2000,        // ms to keep the splash screen showing
+            CANVAS_WIDTH   = 800,                // canvas size
+            CANVAS_HEIGHT  = 600,
+            zzz_last_var_with_semicolon;
+		
+		
+		
+
         /**
          * This function will be called to let you define new scenes that will be
          * shown after the splash screen.
@@ -8,24 +16,7 @@
          * @param director {CAAT.Director}
          */
         function createScenes(director) {
-            var scene = director.createScene();
-
-            for (var i = 0; i < 30; i++) {
-                var w = 30 + (100 * Math.random()) >> 0;
-                var r = (255 * Math.random()) >> 0;
-                var g = (255 * Math.random()) >> 0;
-                var b = (255 * Math.random()) >> 0;
-                scene.addChild(
-                        new CAAT.ShapeActor().
-                                setShape(CAAT.ShapeActor.prototype.SHAPE_CIRCLE).
-                                setBounds(
-                                (director.width * Math.random()) >> 0,
-                                (director.height * Math.random()) >> 0,
-                                w,
-                                w).
-                                setFillStyle('rgb(' + r + ',' + g + ',' + b + ')')
-                        );
-            }
+			WAR.createGameScene(director);
         };
 
 
@@ -38,13 +29,13 @@
                 function() {
                     CAAT.modules.splash.ShowDefaultSplash(
                         /* canvas will be 800x600 pixels */
-                            700, 500,
+                            CANVAS_WIDTH, CANVAS_HEIGHT,
 
                         /* and will be added to the end of document. set an id of a canvas or div element */
                             undefined,
 
                         /* keep splash at least this 5000 milliseconds */
-                            5000,
+                            MS_SHOW_SPLASH_SCREEN,
 
                         /*
                          load these images and set them up for non splash scenes.
