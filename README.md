@@ -59,6 +59,10 @@
   * If you need more files (like new .js files) includes, include them in via this file
 * The actual client side starts up in "public/js/startup.js"
   * See the function near the bottom that does: window.addEventListener -- it creates the "Splash Screen"; and redirects to a function called "createScenes" (in same file)
+* The main "Game" happens in "public/js/gameScene.js" -- this creates the Game Scene and everything that is part of the game
+* The "Map" for the game is in "public/js/mapActor.js" -- this manages the game map
+  * The game map is the ground, the earth, the dirt, the area the tanks roll on, the stuff that gets blown up and deformed by bombs
+  * The "Map" is currently rendering "frames-per-second" in the top.left corner of the game scene
 
 
 ## by UtahJS Group

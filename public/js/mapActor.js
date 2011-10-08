@@ -19,6 +19,7 @@ WAR.MapActor = function(wide,high) {
 WAR.MapActor.prototype= {
 
 		map: [],				// array of map "line" heights
+		previousTime: 0,		// time sent to "paint" on previous frame (used to calculate elapsed time)
 		
 		// frames-per-second variables
 		fpsLast: 0,				// frames-per-second last second
@@ -44,10 +45,10 @@ WAR.MapActor.prototype= {
      * Applies the values of fillStype, strokeStyle, compositeOp, etc.
      *
      * @param director a valid CAAT.Director instance.
-     * @param time an integer with the Scene time the Actor is being drawn.
+     * @param time an integer with the Scene time (in ms) the Actor is being drawn.
      */
     paint : function(director,time) {
-		// fps calculation
+		// ** fps calculation **
 		var now = new Date();
 		if (!this.fpsTimestamp) this.fpsTimestamp = now;
 		if (now - this.fpsTimestamp >= 1000) {
@@ -57,6 +58,11 @@ WAR.MapActor.prototype= {
 		}
 		this.fpsCount++;
 		
+		// ** Perform elapsed time calculations ** ()
+		var msElapsed = time - this.previousTime;				// total elapsed ms since previous frame
+		this.previousTime = time;
+		
+		// ** Paint this actor **
         var ctx= director.crc;
 
         if ( null!==this.fillStyle ) {
@@ -74,7 +80,11 @@ WAR.MapActor.prototype= {
         ctx.fillStyle= 'rgb(100,120,100)';
 		ctx.fill();
 		
-		ctx.fillText("FPS: "+this.fpsLast, 10,50);
+		// paint debug frames-per-second
+		ctx.fillStyle = "rgb(0,0,0)";
+		ctx.fillText("FPS: "+this.fpsLast+".   ms elapsed="+msElapsed, 4,this.height-6);
+		ctx.fillStyle = "rgb(255,255,255)";
+		ctx.fillText("FPS: "+this.fpsLast+".   ms elapsed="+msElapsed, 5,this.height-5);
     }
 };
 
