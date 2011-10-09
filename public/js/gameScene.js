@@ -11,6 +11,14 @@ WAR.createGameScene = function(director) {
     // fill the scene with game content
     var mapActor = new WAR.MapActor(director.width,director.height);		// create THE map
 
+	// create a function the server can call to alter the map data
+	now.updateMap = function(x,v) {
+		if (now && now.mapData && now.mapData.data) {
+			var map = now.mapData.data;
+			map[x] = v;
+		}
+	};
+
     scene.addChild(mapActor);
 };
 
