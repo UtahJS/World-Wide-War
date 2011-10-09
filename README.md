@@ -60,9 +60,15 @@
 * The actual client side starts up in "public/js/startup.js"
   * See the function near the bottom that does: window.addEventListener -- it creates the "Splash Screen"; and redirects to a function called "createScenes" (in same file)
 * The main "Game" happens in "public/js/gameScene.js" -- this creates the Game Scene and everything that is part of the game
-* The "Map" for the game is in "public/js/mapActor.js" -- this manages the game map
+* The "Client-Side Map" for the game is in "public/js/mapActor.js" -- this manages the game map
   * The game map is the ground, the earth, the dirt, the area the tanks roll on, the stuff that gets blown up and deformed by bombs
   * The "Map" is currently rendering "frames-per-second" in the top.left corner of the game scene
+* The "Server-Side Map" for the game is currently found in "app.js" AND in "lib/map.js"
+  * The server has a "setInterval" that randomly changes the map data
+  * And sends an "updateMap" call to each client, with the "map x index" and the "new value for that index"
+  * Each client is always repainting the entire world (which includes the map), so the new map value just gets painted on the next repaint
+  * NOTE: This continues until the server shrinks a single map vertical-line to less than 10 pixels -- then it is "Game Over" and clearInterval happens
+  * To restart the game, refresh the browser
 
 
 ## by UtahJS Group
