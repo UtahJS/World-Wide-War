@@ -58,7 +58,7 @@ var startNewGame = function() {
 			// **** NOTE: This is the server function that changes the map, and passes the new map data to all actors/clients/browsers ****
 			var md = map.mapData;
 			var x = nextX;
-			md.data[x] -= Math.random() * 10;
+			md.data[x] -= Math.random() * 40;
 			if (md.data[x] < 10) {
 				// game over...
 				md.data[x] = 10;
@@ -76,7 +76,7 @@ var startNewGame = function() {
 					});
 				})(x);
 			}
-			nextX += Math.floor(Math.random() * 10);
+			nextX += Math.floor(Math.random() * 5);
 			if (nextX > md.width) {
 				nextX = 0;
 				console.log("Interval... width="+md.width);
