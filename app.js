@@ -35,7 +35,7 @@ map.buildMap();
 
 app.get('/', function(req, res){
   res.render('index', {
-    title: 'Express'
+    title: 'UtahJS: World Wide War'
   });
   
   example.exampleMethod();
