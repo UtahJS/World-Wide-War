@@ -41,7 +41,7 @@ app.get('/', function(req, res){
   example.exampleMethod();
 });
 
-app.listen(3000);
+app.listen(8000);
 everyone = nowjs.initialize(app);
 
 // ** TRY to start a new game (if one is NOt running)
