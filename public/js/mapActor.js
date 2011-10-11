@@ -18,6 +18,8 @@ WAR.MapActor = function(wide,high) {
 
 WAR.MapActor.prototype= {
 
+		// Map Data
+		mapData: null,			// see map.js   ...   {data:[ ],  width:1000}
 		
 		// frames-per-second variables
 		fpsLast: 0,				// frames-per-second last second
@@ -34,6 +36,24 @@ WAR.MapActor.prototype= {
 		this.setBounds(0,0,this.width,this.height);       // allow the make to fill the entire scene area (it will mostly fill the bottom)
 		this.setFillStyle('rgb(200,200,200)');            // primary fill color is the dirt
 		
+	},
+	
+	/**
+	 * define/set the entire map data object (see map.js on server)
+	 */
+	defineMap: function(md) {
+		this.mapData = md;
+	},
+	/**
+	 * update a single column of map data
+	 * @param x = index into map data of column to change
+	 * @param v = new value for that column
+	 */
+	updateMap: function(x, v) {
+		if (this.mapData && this.mapData.data && this.mapData.width > x) {
+			var map = this.mapData.data;
+			map[x] = v;
+		}		
 	},
 
     /**
@@ -70,11 +90,12 @@ WAR.MapActor.prototype= {
         }
 
 		// paint the map (NOTE: Map data is sent to this client from the server)
-		if (now && now.mapData && now.mapData.data) {
-			var map = now.mapData.data;
+		if (this.mapData && this.mapData.data) {
+			var map = this.mapData.data;
 	        ctx.beginPath();
 			ctx.moveTo(0,this.height);
-	        for(var x=0; x<this.width; x++) {
+			var nStop = this.width < this.mapData.width ? this.width : this.mapData.width;
+	        for(var x=0; x<nStop; x++) {
 				ctx.lineTo(x,this.height-map[x]);
 	        }
 			ctx.lineTo(this.width, this.height);
