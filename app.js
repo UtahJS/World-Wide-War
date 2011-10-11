@@ -7,6 +7,7 @@ var express = require('express')
   , example = require('./lib/example')
   , map = require('./lib/map')
   , nowjs = require('now')
+  , sessions = require('./lib/sessions')
   ;
 
 var app = module.exports = express.createServer();
