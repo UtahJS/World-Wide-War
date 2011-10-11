@@ -50,7 +50,18 @@ WAR.MapActor.prototype= {
 	 * @param v = new value for that column
 	 */
 	updateMap: function(x, v) {
-		if (this.mapData && this.mapData.data && this.mapData.width > x) {
+		if (this.mapData && this.mapData.data) {
+			if (typeof (x) == 'number') {
+				this.updateMap1(x,v);
+			} else if (x.length && v.length) {
+				for(var i=0; i<x.length; i++) {
+					this.updateMap1(x[i],v[i]);
+				}
+			}
+		}
+	},
+	updateMap1: function(x, v) {
+		if (this.mapData.width > x) {
 			var map = this.mapData.data;
 			map[x] = v;
 		}		

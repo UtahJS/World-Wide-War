@@ -57,14 +57,26 @@ var startNewGame = function() {
 		intervalKey = setInterval(function() {
 			// **** NOTE: This is the server function that changes the map, and passes the new map data to all actors/clients/browsers ****
 			var md = map.mapData;
-			var x = nextX;
-			md.data[x] -= Math.random() * 40;
-			if (md.data[x] < 10) {
-				// game over...
-				md.data[x] = 10;
-				clearInterval(intervalKey);
-				intervalKey = null;
-				console.log("GAME OVER ... reload browser to restart game");
+			var arX = [];
+			var arV = [];
+
+			for (var qqq=0; qqq<50; qqq++) {
+				var x = nextX;
+				md.data[x] -= Math.random() * 10;
+				if (md.data[x] < 10) {
+					// game over...
+					md.data[x] = 10;
+					clearInterval(intervalKey);
+					intervalKey = null;
+					console.log("GAME OVER ... reload browser to restart game");
+				}
+				arX.push(x);
+				arV.push(md.data[x]);
+				nextX += 1;//Math.floor(Math.random() * 5);
+				if (nextX >= md.width) {
+					nextX = 0;
+					console.log("Interval... width="+md.width);
+				}
 			}
 		
 			for(var i in actors) {
@@ -82,16 +94,11 @@ var startNewGame = function() {
 								}
 							}
 							if (this.now.updateMap) {
-					  			this.now.updateMap(theX, md.data[theX]);
+								this.now.updateMap(arX, arV);
 							}
 						}
 					});
 				})(x);
-			}
-			nextX += 1;//Math.floor(Math.random() * 5);
-			if (nextX >= md.width) {
-				nextX = 0;
-				console.log("Interval... width="+md.width);
 			}
 		}, 50);	// 500ms = 2/second.  50=20/second
 	}
