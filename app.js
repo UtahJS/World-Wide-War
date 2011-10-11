@@ -51,34 +51,32 @@ var startNewGame = function() {
 		// First person to join ... when the previous map has finished
 		map.buildMap();			// re-build the map
 
-		// interval vars
-		var nextX = 0;
-
 		intervalKey = setInterval(function() {
 			// **** NOTE: This is the server function that changes the map, and passes the new map data to all actors/clients/browsers ****
 			var md = map.mapData;
 			var arX = [];
 			var arV = [];
 
+			// alter a chunk of the map (and save each piece altered into arX and arV)
+			var x = Math.floor(Math.random() * (md.width - 100));
+			var startX = x;
 			for (var qqq=0; qqq<50; qqq++) {
-				var x = nextX;
-				md.data[x] -= Math.random() * 10;
+				md.data[x] -= Math.floor(Math.random() * 10);
+				if (qqq > 0) md.data[x] = Math.floor(md.data[startX] + Math.random() * 10 - 8);
 				if (md.data[x] < 10) {
 					// game over...
 					md.data[x] = 10;
 					clearInterval(intervalKey);
 					intervalKey = null;
 					console.log("GAME OVER ... reload browser to restart game");
+					break;
 				}
 				arX.push(x);
 				arV.push(md.data[x]);
-				nextX += 1;//Math.floor(Math.random() * 5);
-				if (nextX >= md.width) {
-					nextX = 0;
-					console.log("Interval... width="+md.width);
-				}
+				x++;
 			}
 		
+			// send map changes to all clients/browser/actors
 			for(var i in actors) {
 				(function(theX) {
 					nowjs.getClient(i, function () {
