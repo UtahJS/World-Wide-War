@@ -78,57 +78,46 @@ var startNewGame = function() {
 			}
 		
 			// send map changes to all clients/browser/actors
-			for(var i in actors) {
-				(function(theX) {
-					nowjs.getClient(i, function () {
-						if (this.now) {
-							if (this.now.defineMap) {
-								// Note: FireFox takes a rather LONG time to send the map data, and sometimes it doesn't get there
-								// Note: continue sending the entire map to the client, until the client replies: "gotMap"
-								if (!this.now.mapSent) this.now.mapSent = 0;
-								this.now.mapSent++;
-								if (this.now.mapSent < 10 || !this.now.gotMap) {
-									console.log("calling defineMap for "+i+".   mapSent="+this.now.mapSent+".   md.width="+md.width);
-									this.now.defineMap(md);
-								}
-							}
-							if (this.now.updateMap) {
-								this.now.updateMap(arX, arV);
-							}
-						}
-					});
-				})(x);
-			}
+			sessions.runOnAllSessions(function(sess, id) {
+				sendMapToClients(id,arX, arV);
+			});
 		}, 50);	// 500ms = 2/second.  50=20/second
 	}
 };
 
+// send an update/change of the map to all client browsers
+var sendMapToClients = function(id, arX, arV) {
+	nowjs.getClient(id, function () {
+		var md = map.mapData;
+		if (this.now) {
+			if (this.now.defineMap) {
+				// Note: FireFox takes a rather LONG time to send the map data, and sometimes it doesn't get there
+				// Note: continue sending the entire map to the client, until the client replies: "gotMap"
+				if (!this.now.mapSent) this.now.mapSent = 0;
+				this.now.mapSent++;
+				if (this.now.mapSent < 10 || !this.now.gotMap) {
+					console.log("calling defineMap for "+id+".   mapSent="+this.now.mapSent+".   md.width="+md.width);
+					this.now.defineMap(md);
+				}
+			}
+			if (this.now.updateMap) {
+				this.now.updateMap(arX, arV);
+			}
+		}
+	});
+};
+
 // ** Track all client-browser connections (stored in "actors")
-var actors = [];					// actors = collection of "Now" clients
-var numActors = 0;
 nowjs.on('connect', function() {
-	actors[this.user.clientId] = {x: 0, y: 0};
-	numActors++;
-	console.log("Client just connected.  Total connected="+actors.length+" == " + numActors);
-	console.dir(this.user);
+	sessions.createSessionViaNow(this.user);
 	startNewGame();
 });
 nowjs.on('disconnect', function() {
-  for(var i in actors) {
-    if(i == this.user.clientId) {
-      delete actors[i];
-      break;
-    }
-  }
-	numActors--;
-	console.log("Client just DISCONNECTED.  Total connected="+actors.length+" == " + numActors);
+	sessions.deleteSessionViaNow(this.user);
 });
 
 
 // initialize + configuration
-
-// *** PUBLISH TO CLIENT: "The Map Data" (@TODO: don't publish 1 game's map to "everyone" -- when we allow multiple games running)
-//everyone.now.mapData = map.mapData;
 
 // *** PUBLISH TO CLIENT: debug log function (allow client to record log messages on the server console)
 everyone.now.logStuff = function(msg){
