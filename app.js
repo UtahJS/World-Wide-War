@@ -78,16 +78,16 @@ var startNewGame = function() {
 			}
 		
 			// send map changes to all clients/browser/actors
-			sessions.runOnAllSessions(function(sess, id) {
-				sendMapToClients(id,arX, arV);
+			sessions.runOnAllSessions(function(sess) {
+				sendMapToClients(sess,arX, arV);
 			});
 		}, 50);	// 500ms = 2/second.  50=20/second
 	}
 };
 
 // send an update/change of the map to all client browsers
-var sendMapToClients = function(id, arX, arV) {
-	nowjs.getClient(id, function () {
+var sendMapToClients = function(sess, arX, arV) {
+	nowjs.getClient(sess.id, function () {
 		var md = map.mapData;
 		if (this.now) {
 			if (this.now.defineMap) {
@@ -96,7 +96,7 @@ var sendMapToClients = function(id, arX, arV) {
 				if (!this.now.mapSent) this.now.mapSent = 0;
 				this.now.mapSent++;
 				if (this.now.mapSent < 10 || !this.now.gotMap) {
-					console.log("calling defineMap for "+id+".   mapSent="+this.now.mapSent+".   md.width="+md.width);
+					console.log("calling defineMap for "+sess.id+".   mapSent="+this.now.mapSent+".   md.width="+md.width);
 					this.now.defineMap(md);
 				}
 			}
