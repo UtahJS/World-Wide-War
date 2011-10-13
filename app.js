@@ -5,12 +5,15 @@
 var express = require('express')
   , everyone
   , example = require('./lib/example')
-  , map = require('./lib/map')
+  , mapConstructor = require('./lib/map')
   , nowjs = require('now')
   , sessions = require('./lib/sessions')
+  , game = require('./game')
   ;
 
 var app = module.exports = express.createServer();
+
+var map = new mapConstructor.newMap(1000);		// create a new map that is 1000 pixels wide
 
 // Configuration
 
@@ -107,8 +110,9 @@ var sendMapToClients = function(sess, arX, arV) {
 	});
 };
 
-// ** Track all client-browser connections (stored in "actors")
+// ** Track all client-browser connections (stored in "sessions")
 nowjs.on('connect', function() {
+	var id = this.user.clientId;
 	sessions.createSessionViaNow(this.user);
 	startNewGame();
 });
