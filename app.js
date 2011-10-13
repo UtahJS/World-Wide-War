@@ -5,15 +5,18 @@
 var express = require('express')
   , everyone
   , example = require('./lib/example')
-  , mapConstructor = require('./lib/map')
+//  , mapConstructor = require('./lib/map')
   , nowjs = require('now')
   , sessions = require('./lib/sessions')
-  , game = require('./game')
+  , gameConstructor = require('./game')
   ;
 
 var app = module.exports = express.createServer();
 
-var map = new mapConstructor.newMap(1000);		// create a new map that is 1000 pixels wide
+
+var myGame = new gameConstructor.newGame(1000);		// create a game with a map of 1000 pixels wide
+//var map = new mapConstructor.newMap(1000);		// create a new map that is 1000 pixels wide
+var map = myGame.map;
 
 // Configuration
 

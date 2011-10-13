@@ -4,6 +4,7 @@
 // USAGE:
 // var gameConstuctor = require('game');
 // var myGame = new gameConstructor.newGame();
+// myGame.map = the "my-game-map" object
 
 
 var mapConstructor = require('./lib/map')
@@ -13,18 +14,15 @@ var mapConstructor = require('./lib/map')
 
 var newGame = (function() {
 	var name = 'private';
-	var map;
 	
 	// constructor
 	return function(width) {
-		map = new mapConstructor.newMap(width);		// create a new map that is 1000 pixels wide
-		this.name = name;
+		this.map = new mapConstructor.newMap(width);		// create a new map that is 1000 pixels wide
+		return this;
 	};
 
 })();
 
 
 exports.newGame = newGame;
-
-//var game = require('game').newGame('My Name');
 
