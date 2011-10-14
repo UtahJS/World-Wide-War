@@ -5,7 +5,6 @@
 var express = require('express')
   , everyone
   , example = require('./lib/example')
-//  , mapConstructor = require('./lib/map')
   , nowjs = require('now')
   , sessions = require('./lib/sessions')
   , gameConstructor = require('./game')
@@ -13,9 +12,8 @@ var express = require('express')
 
 var app = module.exports = express.createServer();
 
-
+// @TODO: instantiate "game" after people have joined, and selected a game
 var myGame = new gameConstructor.newGame(1000);		// create a game with a map of 1000 pixels wide
-//var map = new mapConstructor.newMap(1000);		// create a new map that is 1000 pixels wide
 var map = myGame.map;
 
 // Configuration
