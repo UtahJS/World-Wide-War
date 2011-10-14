@@ -74,6 +74,15 @@ var startNewGame = function() {
 					clearInterval(intervalKey);
 					intervalKey = null;
 					console.log("GAME OVER ... reload browser to restart game");
+
+					sessions.runOnAllSessions(function(sess) {
+						nowjs.getClient(sess.id, function () {
+							if (this.now) {
+								this.now.moveToStartScene();
+							}
+						});
+					});
+					
 					break;
 				}
 				arX.push(x);
@@ -115,12 +124,22 @@ var sendMapToClients = function(sess, arX, arV) {
 nowjs.on('connect', function() {
 	var id = this.user.clientId;
 	sessions.createSessionViaNow(this.user);
-	startNewGame();
 });
 nowjs.on('disconnect', function() {
 	sessions.deleteSessionViaNow(this.user);
 });
 
+everyone.now.startGame = function() {
+	sessions.runOnAllSessions(function(sess) {
+		nowjs.getClient(sess.id, function () {
+			if (this.now) {
+				this.now.moveToGameScene();
+			}
+		});
+	});
+
+	startNewGame();
+};
 
 // initialize + configuration
 

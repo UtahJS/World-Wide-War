@@ -16,6 +16,7 @@
          * @param director {CAAT.Director}
          */
         function createScenes(director) {
+        	WAR.startGameScene(director);
 			WAR.createGameScene(director);
         };
 
