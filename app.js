@@ -110,12 +110,22 @@ var sendMapToClients = function(sess, arX, arV) {
 // ** Track all client-browser connections (stored in "actors")
 nowjs.on('connect', function() {
 	sessions.createSessionViaNow(this.user);
-	startNewGame();
 });
 nowjs.on('disconnect', function() {
 	sessions.deleteSessionViaNow(this.user);
 });
 
+everyone.now.startGame = function() {
+	sessions.runOnAllSessions(function(sess) {
+		nowjs.getClient(sess.id, function () {
+			if (this.now) {
+				this.now.moveToGameScene();
+			}
+		});
+	});
+
+	startNewGame();
+};
 
 // initialize + configuration
 
