@@ -70,6 +70,15 @@ var startNewGame = function() {
 					clearInterval(intervalKey);
 					intervalKey = null;
 					console.log("GAME OVER ... reload browser to restart game");
+
+					sessions.runOnAllSessions(function(sess) {
+						nowjs.getClient(sess.id, function () {
+							if (this.now) {
+								this.now.moveToStartScene();
+							}
+						});
+					});
+					
 					break;
 				}
 				arX.push(x);

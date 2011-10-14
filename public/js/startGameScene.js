@@ -62,6 +62,14 @@
 			        true
 			);
 		};
+
+		now.moveToStartScene = function() {
+			director.switchToPrevScene(
+			        2000,
+			        false,
+			        true
+			);
+		};
 		
 		var button= createButton(director);
 	    button.mouseClick= function(e) {
