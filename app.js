@@ -43,7 +43,7 @@ app.get('/', function(req, res){
   example.exampleMethod();
 });
 
-app.listen(8008);
+app.listen(8000);
 everyone = nowjs.initialize(app);
 
 // *** Start a new game !!
