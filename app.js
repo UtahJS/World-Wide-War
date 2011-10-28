@@ -45,17 +45,20 @@ app.get('/', function(req, res){
   example.exampleMethod();
 });
 
-app.listen(8000);
+app.listen(8008);
 everyone = nowjs.initialize(app);
 
 // ** TRY to start a new game (if one is NOt running)
 var intervalKey = null;				// ID for the one-and-only map-updater-interval-timer (null means no timer is running)
 var startNewGame = function() {
 	var nPlayers = sessions.countSessions();		// total players going to play this game
-	var nWide = 500 + nPlayers * 100;				// world width
+	var nWide = 500 + nPlayers * 300;				// world width
 	myGame = new gameConstructor.newGame(nWide);	// create a game with a map of N pixels wide
 	myGame.map.buildMap();							// build the map
-	myGame.buildAllTanks();							// build ALL tanks for all users
+	myGame.startGameLoop();							// start up the main game loop
+	return;
+	
+	
 	if (!intervalKey) {
 		// First person to join ... when the previous map has finished
 
