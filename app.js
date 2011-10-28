@@ -122,13 +122,11 @@ var sendMapToClients = function(sess, arX, arV) {
 				if (this.now.mapSent < 10 || !this.now.gotMap) {
 					console.log("calling defineMap for "+sess.id+".   mapSent="+this.now.mapSent+".   md.width="+md.width);
 					this.now.defineMap(md);
+					myGame.sendTanks();
 				}
 			}
 			if (this.now.updateMap) {
 				this.now.updateMap(arX, arV);
-			}
-			if (myGame && this.now.gotMap) {
-				myGame.sendTanks();
 			}
 		}
 	});

@@ -27,6 +27,11 @@ WAR.createGameScene = function(director) {
 		// 	map[x] = v;
 		// }
 	};
+	
+	// create a function the server can call to SET the entire collection of tanks
+	now.setInitialTanks = function(td) {
+		console.log("JUST GOT TANK DATA");
+	};
 
     scene.addChild(mapActor);
 };

@@ -9,6 +9,7 @@
 
 var mapConstructor = require('./lib/map')
   , sessions = require('./lib/sessions')
+  , nowjs = require('now')
   ;
 
 
@@ -47,12 +48,15 @@ var updateTanks = function(ms) {
 
 // send all initial tanks to all clients
 var sendTanks = function() {
+	console.log("sendTanks called");
 	var self = this;
 	sessions.runOnAllSessions(function(sess) {
-		if (this.now && this.now.setInitialTanks) {
-			// @TODO: need to add "setInitialTanks" method on the client
-			this.now.setInitialTanks(self.tanks);
-		}
+		nowjs.getClient(sess.id, function () {
+			if (this.now && this.now.setInitialTanks) {
+				this.now.setInitialTanks(self.tanks);
+				console.log("setInitalTanks called");
+			}
+		});
 	});
 };
 
