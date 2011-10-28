@@ -60,6 +60,13 @@ var startNewGame = function() {
 		// First person to join ... when the previous map has finished
 
 		intervalKey = setInterval(function() {
+			// Time to update the game
+
+			// @TODO: calculate elapsed ms per frame
+			var msElapsed = 50;
+			myGame.updateTanks(msElapsed);
+
+			// @TODO: remove this temp debug test code that is monkeying with the map			
 			// **** NOTE: This is the server function that changes the map, and passes the new map data to all actors/clients/browsers ****
 			var md = myGame.map.mapData;
 			var arX = [];
@@ -119,6 +126,9 @@ var sendMapToClients = function(sess, arX, arV) {
 			}
 			if (this.now.updateMap) {
 				this.now.updateMap(arX, arV);
+			}
+			if (myGame && this.now.gotMap) {
+				myGame.sendTanks();
 			}
 		}
 	});
