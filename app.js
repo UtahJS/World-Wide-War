@@ -14,7 +14,6 @@ var app = module.exports = express.createServer();
 
 // @TODO: instantiate "game" after people have joined, and selected a game
 var myGame = new gameConstructor.newGame(1000);		// create a game with a map of 1000 pixels wide
-var map = myGame.map;
 
 // Configuration
 
@@ -35,7 +34,7 @@ app.configure('production', function(){
   app.use(express.errorHandler()); 
 });
 
-map.buildMap();
+myGame.map.buildMap();
 // Routes
 
 app.get('/', function(req, res){
@@ -52,13 +51,17 @@ everyone = nowjs.initialize(app);
 // ** TRY to start a new game (if one is NOt running)
 var intervalKey = null;				// ID for the one-and-only map-updater-interval-timer (null means no timer is running)
 var startNewGame = function() {
+	var nPlayers = sessions.countSessions();		// total players going to play this game
+	var nWide = 500 + nPlayers * 100;				// world width
+	myGame = new gameConstructor.newGame(nWide);	// create a game with a map of N pixels wide
+	myGame.map.buildMap();							// build the map
+	myGame.buildAllTanks();							// build ALL tanks for all users
 	if (!intervalKey) {
 		// First person to join ... when the previous map has finished
-		map.buildMap();			// re-build the map
 
 		intervalKey = setInterval(function() {
 			// **** NOTE: This is the server function that changes the map, and passes the new map data to all actors/clients/browsers ****
-			var md = map.mapData;
+			var md = myGame.map.mapData;
 			var arX = [];
 			var arV = [];
 
@@ -98,10 +101,11 @@ var startNewGame = function() {
 	}
 };
 
+
 // send an update/change of the map to all client browsers
 var sendMapToClients = function(sess, arX, arV) {
 	nowjs.getClient(sess.id, function () {
-		var md = map.mapData;
+		var md = myGame.map.mapData;
 		if (this.now) {
 			if (this.now.defineMap) {
 				// Note: FireFox takes a rather LONG time to send the map data, and sometimes it doesn't get there
@@ -129,7 +133,11 @@ nowjs.on('disconnect', function() {
 	sessions.deleteSessionViaNow(this.user);
 });
 
+// When anyone clicks "Start Game", this function is called
 everyone.now.startGame = function() {
+	// create a new game
+	startNewGame();
+	// tell everyone to switch to the "Game Scene"
 	sessions.runOnAllSessions(function(sess) {
 		nowjs.getClient(sess.id, function () {
 			if (this.now) {
@@ -137,8 +145,6 @@ everyone.now.startGame = function() {
 			}
 		});
 	});
-
-	startNewGame();
 };
 
 // initialize + configuration
