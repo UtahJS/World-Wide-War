@@ -52,7 +52,22 @@ var buildAllTanks = function(nTanksPerPlayer) {
 
 // update all tanks and send changes to all clients
 var updateTanks = function(msElapsed) {
-	// @TODO: move tanks based on "ms elapsed time"
+	var self = this;
+	// move tanks based on "ms elapsed time"
+	for(var i=0; i<this.tanks.length; i++) {
+		this.tanks[i].update(msElapsed);
+	}
+	// @TODO: generate an array of the "dirty tanks" to send, instead of every tank
+	sessions.runOnAllSessions(function(sess) {
+		// sess = session of one of the player
+		// sess.id = unique id for this player
+		nowjs.getClient(sess.id, function () {
+			// Note: 'this" == "now client"
+			if (this.now && this.now.updateTanks) {
+				this.now.updateTanks(self.tanks);			// send tank collection
+			}
+		});
+	});	
 };
 
 
@@ -92,7 +107,7 @@ var processOneLoop = function(msElapsed) {
 	
 	
 	// allow everything to "process time"
-	this.updateTanks(msElapsed);				// move tanks
+	this.updateTanks(msElapsed);				// move tanks (and send data to all clients)
 	this.map.updateMap(msElapsed);				// shift dirt on world (and send data to all clients)
 	
 	// send data to clients

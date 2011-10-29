@@ -50,6 +50,30 @@ WAR.createGameScene = function(director) {
 			}
 		}
 	};
+	
+	// create a function the server can call to update tanks info (position, facing ...)
+	// @param {array} td = array of tank data
+	now.updateTanks = function(td) {
+		if (td) {
+			for(var i=0; i<td.length; i++) {
+				var d = td[i];
+				if (tankData[d.id]) {
+					// KNOWN TANK
+					var tank = tankData[d.id];			// passed in tank data
+					tank.x = d.x;
+					tank.y = d.y;
+					var actor = tank.actor;				// CAAT actor for this tank
+					actor.setLocation(d.x, d.y);
+				} else {
+					// NEW TANK
+					tankData[d.id] = d;
+					d.actor = new WAR.TankActor(d.x,d.y);
+					scene.addChild(d.actor);
+				}
+			}
+		}
+	};
+	
 
     scene.addChild(mapActor);
 };
