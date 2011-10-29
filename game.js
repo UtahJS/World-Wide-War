@@ -66,7 +66,7 @@ var sendInitialStateToAllClients = function(msElapsed) {
 		this.msSinceSentInitial += msElapsed;
 	
 		// re-send data every 1/4 second
-		if (this.msSinceSentInitial > 250) {
+		if (this.msSinceSentInitial > 500) {
 			this.msSinceSentInitial = 0;
 			sessions.runOnAllSessions(function(sess) {
 				self.timesSentInitial++;
@@ -92,58 +92,23 @@ var processOneLoop = function(msElapsed) {
 	
 	
 	// allow everything to "process time"
-	this.updateTanks(msElapsed);
+	this.updateTanks(msElapsed);				// move tanks
+	this.map.updateMap(msElapsed);				// shift dirt on world (and send data to all clients)
 	
 	// send data to clients
 	this.sendInitialStateToAllClients(msElapsed);
 	
-	
-	// @TODO: remove this temp debug test code that is monkeying with the map			
-	// **** NOTE: This is the server function that changes the map, and passes the new map data to all actors/clients/browsers ****
-	var md = this.map.mapData;
-	var arX = [];
-	var arV = [];
-	
-	// alter a chunk of the map (and save each piece altered into arX and arV)
-	var x = Math.floor(Math.random() * (md.width - 100));
-	var startX = x;
-	for (var qqq=0; qqq<50; qqq++) {
-		md.data[x] -= Math.floor(Math.random() * 10);
-		if (qqq > 0) md.data[x] = Math.floor(md.data[startX] + Math.random() * 10 - 8);
-		if (md.data[x] < 10) {
-			// game over...
-			md.data[x] = 10;
-			
-			// **** GAME OVER ****
-			clearInterval(intervalKey);
-			intervalKey = null;
-			console.log("GAME OVER ... reload browser to restart game");
-			sessions.runOnAllSessions(function(sess) {
-				nowjs.getClient(sess.id, function () {
-					if (this.now) {
-						this.now.moveToStartScene();
-					}
-				});
-			});
-			break;
-		}
-		arX.push(x);
-		arV.push(md.data[x]);
-		x++;
+	// @TODO: determine if the game is over
+	if (this.msTotalElapsed > 10000) {			// let play for 10 second, then quit (DEBUG)
+		this.gameOver = true;
 	}
-	
-	// send map changes to all clients/browser/actors
-	sessions.runOnAllSessions(function(sess) {
-		// Note: 'this" == "now client"
-		self.map.sendToClient(sess,arX, arV);
-	});
-	
 };
 
 // startup the main game loop
 var intervalKey = undefined;
 var startGameLoop = function() {
 	this.msTotalElapsed = 0;			// total ms elapsed since game loop started
+	this.gameOver = false;				// flag to indicate GAME OVER
 	var self = this;
 	if (!intervalKey) {
 		intervalKey = setInterval(function() {
@@ -151,7 +116,22 @@ var startGameLoop = function() {
 			var msElapsed = 50;
 			self.msTotalElapsed += msElapsed;
 			self.processOneLoop(msElapsed);
-
+			if (self.gameOver) {
+				// **** GAME OVER ****
+				clearInterval(intervalKey);
+				intervalKey = null;
+				console.log("GAME OVER ... reload browser to restart game");
+				// tell every browser to bo back to the "start screen" (game over)
+				sessions.runOnAllSessions(function(sess) {
+					nowjs.getClient(sess.id, function () {
+						if (this.now) {
+							this.now.moveToStartScene();
+							// @TODO: reset all game data in the "now" space
+							this.now.gotMap = false;
+						}
+					});
+				});
+			}
 		}, 50);	// 500ms = 2/second.  50=20/second
 	}
 };
