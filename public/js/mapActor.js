@@ -43,7 +43,6 @@ WAR.MapActor.prototype= {
 	 */
 	defineMap: function(md) {
 		this.mapData = md;
-		console.log("map data received. width="+md.width+"   height="+md.data[30]);
 	},
 	/**
 	 * update a single column of map data

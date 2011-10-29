@@ -51,104 +51,107 @@ var buildAllTanks = function(nTanksPerPlayer) {
 };
 
 // update all tanks and send changes to all clients
-var updateTanks = function(ms) {
+var updateTanks = function(msElapsed) {
 	// @TODO: move tanks based on "ms elapsed time"
+};
+
+
+// Note: FireFox takes a rather LONG time to send the map data, and sometimes it doesn't get there
+// Note: continue sending the entire map to the client, until the client replies: "gotMap"
+var sendInitialStateToAllClients = function(msElapsed) {
+	var self = this;
+	if (!this.msSinceSentInitial) this.msSinceSentInitial = 0;				// ms elapsed since sent last "initial state" to all clients
+	if (!this.timesSentInitial) this.timesSentInitial = 0;					// count total times sent the initial state to all
+	if (this.timesSentInitial < 20) {
+		this.msSinceSentInitial += msElapsed;
 	
-	// @TODO: send altered tank data to everyone
-	sessions.runOnAllSessions(function(sess) {
-//		sendTanksToClients(sess,arX, arV);
-	});
-};
-
-// send all initial tanks to all clients
-var sendTanks = function() {
-	var self = this;
-	sessions.runOnAllSessions(function(sess) {
-		nowjs.getClient(sess.id, function () {
-			if (this.now && this.now.setInitialTanks) {
-				this.now.setInitialTanks(self.tanks);
-			}
-		});
-	});
-};
-
-// send an update/change of the map to all client browsers
-var sendMapToClients = function(sess, arX, arV) {
-	var self = this;
-	nowjs.getClient(sess.id, function () {
-		// Note: this = "now client data"
-		var md = self.map.mapData;
-		if (this.now) {
-			if (this.now.defineMap) {
-				// Note: FireFox takes a rather LONG time to send the map data, and sometimes it doesn't get there
-				// Note: continue sending the entire map to the client, until the client replies: "gotMap"
-				if (!this.now.mapSent) this.now.mapSent = 0;
-				this.now.mapSent++;
-				if (this.now.mapSent < 10 || !this.now.gotMap) {
-					console.log("GAME: calling defineMap for "+sess.id+".   mapSent="+this.now.mapSent+".   md.width="+md.width);
-					this.now.defineMap(md);
-					self.sendTanks();
-				}
-			}
-			if (this.now.updateMap) {
-				this.now.updateMap(arX, arV);
-			}
+		// re-send data every 1/4 second
+		if (this.msSinceSentInitial > 250) {
+			this.msSinceSentInitial = 0;
+			sessions.runOnAllSessions(function(sess) {
+				self.timesSentInitial++;
+				nowjs.getClient(sess.id, function () {
+					// Note: 'this" == "now client"
+					if (this.now && !this.now.gotMap) {
+						// client has NOT received map from server yet
+						console.log("GAME: sending initial data to "+sess.id);
+						self.map.sendInitialData(sess);					// send world map
+						this.now.setInitialTanks(self.tanks);			// send tank collection
+					}
+				});
+			});
 		}
-	});
+	}
 };
 
-
+// part of the main game loop.  Process one game loop.
+// "msElapsed" milliseconds have elapsed since the last game loop was processed
+var processOneLoop = function(msElapsed) {
+	var self = this;
+	// Time to update the game for 1 frame
+	
+	
+	// allow everything to "process time"
+	this.updateTanks(msElapsed);
+	
+	// send data to clients
+	this.sendInitialStateToAllClients(msElapsed);
+	
+	
+	// @TODO: remove this temp debug test code that is monkeying with the map			
+	// **** NOTE: This is the server function that changes the map, and passes the new map data to all actors/clients/browsers ****
+	var md = this.map.mapData;
+	var arX = [];
+	var arV = [];
+	
+	// alter a chunk of the map (and save each piece altered into arX and arV)
+	var x = Math.floor(Math.random() * (md.width - 100));
+	var startX = x;
+	for (var qqq=0; qqq<50; qqq++) {
+		md.data[x] -= Math.floor(Math.random() * 10);
+		if (qqq > 0) md.data[x] = Math.floor(md.data[startX] + Math.random() * 10 - 8);
+		if (md.data[x] < 10) {
+			// game over...
+			md.data[x] = 10;
+			
+			// **** GAME OVER ****
+			clearInterval(intervalKey);
+			intervalKey = null;
+			console.log("GAME OVER ... reload browser to restart game");
+			sessions.runOnAllSessions(function(sess) {
+				nowjs.getClient(sess.id, function () {
+					if (this.now) {
+						this.now.moveToStartScene();
+					}
+				});
+			});
+			break;
+		}
+		arX.push(x);
+		arV.push(md.data[x]);
+		x++;
+	}
+	
+	// send map changes to all clients/browser/actors
+	sessions.runOnAllSessions(function(sess) {
+		// Note: 'this" == "now client"
+		self.map.sendToClient(sess,arX, arV);
+	});
+	
+};
 
 // startup the main game loop
 var intervalKey = undefined;
 var startGameLoop = function() {
+	this.msTotalElapsed = 0;			// total ms elapsed since game loop started
 	var self = this;
 	if (!intervalKey) {
 		intervalKey = setInterval(function() {
-			// Time to update the game for 1 frame
-
 			// @TODO: calculate elapsed ms per frame (for now, just hardcode a guess of 50)
 			var msElapsed = 50;
-			self.updateTanks(msElapsed);
+			self.msTotalElapsed += msElapsed;
+			self.processOneLoop(msElapsed);
 
-			// @TODO: remove this temp debug test code that is monkeying with the map			
-			// **** NOTE: This is the server function that changes the map, and passes the new map data to all actors/clients/browsers ****
-			var md = self.map.mapData;
-			var arX = [];
-			var arV = [];
-
-			// alter a chunk of the map (and save each piece altered into arX and arV)
-			var x = Math.floor(Math.random() * (md.width - 100));
-			var startX = x;
-			for (var qqq=0; qqq<50; qqq++) {
-				md.data[x] -= Math.floor(Math.random() * 10);
-				if (qqq > 0) md.data[x] = Math.floor(md.data[startX] + Math.random() * 10 - 8);
-				if (md.data[x] < 10) {
-					// game over...
-					md.data[x] = 10;
-					
-					// **** GAME OVER ****
-					clearInterval(intervalKey);
-					intervalKey = null;
-					console.log("GAME OVER ... reload browser to restart game");
-					sessions.runOnAllSessions(function(sess) {
-						nowjs.getClient(sess.id, function () {
-							if (this.now) {
-								this.now.moveToStartScene();
-							}
-						});
-					});
-					break;
-				}
-				arX.push(x);
-				arV.push(md.data[x]);
-				x++;
-			}
-		
-			// send map changes to all clients/browser/actors
-			sessions.runOnAllSessions(function(sess) {
-				self.sendMapToClients(sess,arX, arV);
-			});
 		}, 50);	// 500ms = 2/second.  50=20/second
 	}
 };
@@ -169,10 +172,10 @@ var newGame = (function() {
 		this.init = init;									// initialize a whole new game
 		this.buildTheMap = buildTheMap;
 		this.buildAllTanks = buildAllTanks;
+		this.processOneLoop = processOneLoop;
 		this.startGameLoop = startGameLoop;					// startup the main game loop
-		this.sendTanks = sendTanks;							// initial send all tank data to all clients
 		this.updateTanks = updateTanks;						// update all tanks for N ms
-		this.sendMapToClients = sendMapToClients;
+		this.sendInitialStateToAllClients = sendInitialStateToAllClients;
 
 		return this;
 	};

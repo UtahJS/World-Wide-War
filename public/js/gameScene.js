@@ -21,7 +21,6 @@ WAR.createGameScene = function(director) {
 
 	// create a function the server can call to define the entire map data
 	now.defineMap = function(md) {
-		console.log("Game.defineMap called.  with="+md.width);
 		if (md && md.width) {
 			now.gotMap = true;
 		}
