@@ -21,15 +21,13 @@ var rand = function(max) {
 // Note: "this" == the game object
 // Note: when this function returns, the tanks have NOT been created yet
 var buildAllTanks = function(self, nTanksPerPlayer) {
-	console.log("buildAllTanks.  this="+self);
 	sessions.runOnAllSessions(function(sess) {
 		// sess = session of one of the player
 		// sess.id = unique id for this player
 		for(var tn=0; tn<nTanksPerPlayer; tn++) {
 			// create a random tank object some where in the world
-			var tankObj = tankConstructor.newTank(sess.id);
+			var tankObj = new tankConstructor.newTank(sess.id);
 			self.tanks.push(tankObj);
-			console.log("Built tank# " + tankObj.id + " for client " + tankObj.user);
 		}
 	});
 };
@@ -46,13 +44,15 @@ var updateTanks = function(ms) {
 
 // send all initial tanks to all clients
 var sendTanks = function() {
-	console.log("sendTanks called");
 	var self = this;
 	sessions.runOnAllSessions(function(sess) {
 		nowjs.getClient(sess.id, function () {
 			if (this.now && this.now.setInitialTanks) {
 				this.now.setInitialTanks(self.tanks);
-				console.log("setInitalTanks called");
+				console.log("setInitalTanks called: length="+self.tanks.length);
+				for(var i=0; i<self.tanks.length; i++) {
+					console.log("i="+i+" id="+self.tanks[i].id);
+				}
 			}
 		});
 	});

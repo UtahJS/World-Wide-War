@@ -5,6 +5,9 @@
  * @param director {CAAT.Director}
  */
 WAR.createGameScene = function(director) {
+
+	var tankData = [];
+
 	// create the actual game scene object
     var scene = director.createScene();
 
@@ -30,7 +33,14 @@ WAR.createGameScene = function(director) {
 	
 	// create a function the server can call to SET the entire collection of tanks
 	now.setInitialTanks = function(td) {
-		console.log("JUST GOT TANK DATA");
+		console.log("JUST GOT TANK DATA. total tanks="+td.length);
+		if (td) {
+			for(var i=0; i<td.length; i++) {
+				var d = td[i];
+				console.log("Tank id="+d.id+" pos="+d.x+","+d.y+" user="+d.user);
+				tankData.push(d);
+			}
+		}
 	};
 
     scene.addChild(mapActor);
