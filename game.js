@@ -27,6 +27,7 @@ var buildAllTanks = function(self, nTanksPerPlayer) {
 		for(var tn=0; tn<nTanksPerPlayer; tn++) {
 			// create a random tank object some where in the world
 			var tankObj = new tankConstructor.newTank(sess.id);
+			tankObj.initTank(self.map);
 			self.tanks.push(tankObj);
 		}
 	});
@@ -49,10 +50,6 @@ var sendTanks = function() {
 		nowjs.getClient(sess.id, function () {
 			if (this.now && this.now.setInitialTanks) {
 				this.now.setInitialTanks(self.tanks);
-				console.log("setInitalTanks called: length="+self.tanks.length);
-				for(var i=0; i<self.tanks.length; i++) {
-					console.log("i="+i+" id="+self.tanks[i].id);
-				}
 			}
 		});
 	});

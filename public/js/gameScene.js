@@ -6,7 +6,7 @@
  */
 WAR.createGameScene = function(director) {
 
-	var tankData = [];
+	var tankData = {};			// tank-id === the key
 
 	// create the actual game scene object
     var scene = director.createScene();
@@ -33,13 +33,23 @@ WAR.createGameScene = function(director) {
 	
 	// create a function the server can call to SET the entire collection of tanks
 	now.setInitialTanks = function(td) {
-		console.log("JUST GOT TANK DATA. total tanks="+td.length);
 		if (td) {
 			for(var i=0; i<td.length; i++) {
 				var d = td[i];
-				console.log("Tank id="+d.id+" pos="+d.x+","+d.y+" user="+d.user);
-				tankData.push(d);
+				if (!tankData[d.id]) {
+					// NEW TANK
+					tankData[d.id] = d;
+					d.actor = new WAR.TankActor(d.x,d.y);
+					scene.addChild(d.actor);
+				}
 			}
+			var cnt = 0;
+			for(var key in tankData) {
+				if (tankData.hasOwnProperty(key)) {
+					cnt++;
+				}
+			}
+			console.log("Now have " + cnt + " tanks");
 		}
 	};
 
