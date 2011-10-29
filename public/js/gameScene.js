@@ -14,8 +14,14 @@ WAR.createGameScene = function(director) {
     // fill the scene with game content
     var mapActor = new WAR.MapActor(director.width,director.height);		// create THE map
 
+	// create a function the server can call to show something on browser console
+	now.logToClientConsole = function(msg) {
+		console.log("Message from Server: " + msg);
+	};
+
 	// create a function the server can call to define the entire map data
 	now.defineMap = function(md) {
+		console.log("Game.defineMap called.  with="+md.width);
 		if (md && md.width) {
 			now.gotMap = true;
 		}
@@ -43,13 +49,6 @@ WAR.createGameScene = function(director) {
 					scene.addChild(d.actor);
 				}
 			}
-			var cnt = 0;
-			for(var key in tankData) {
-				if (tankData.hasOwnProperty(key)) {
-					cnt++;
-				}
-			}
-			console.log("Now have " + cnt + " tanks");
 		}
 	};
 

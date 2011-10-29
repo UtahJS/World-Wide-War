@@ -29,7 +29,6 @@ WAR.TankActor.prototype= {
 
 	// initialize the tank object
 	init: function(x,y) {
-	console.log("Tank created at: "+x+","+y);
 		this.x = x;
 		this.y = y;
 		this.setBounds(this.x,this.y,this.width,this.height);          // set tank initial position and size

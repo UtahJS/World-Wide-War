@@ -13,14 +13,31 @@ var mapConstructor = require('./lib/map')
   , tankConstructor = require('./lib/tank')
   ;
 
-
+// helper function: select a random number between 0 and max-1
 var rand = function(max) {
 	return Math.floor(Math.random() * max);
 };
+
+// initialize this game object for a whole new game
+// @param {number} width  The width of the world
+// @param {number) [nTanksPerPlayer]  The number of tanks each player starts with (defaults to 3)
+var init = function(width, nTanksPerPlayer) {
+	if (!nTanksPerPlayer) nTanksPerPlayer = 3;
+	this.buildTheMap(width);
+	this.buildAllTanks(nTanksPerPlayer);
+};
+
+// create the map of the world
+var buildTheMap = function(width) {
+	this.map = new mapConstructor.newMap(width);		// create a new map that is N pixels wide
+	this.map.buildMap();
+};
+
 // create a new set of tanks for all existing players
-// Note: "this" == the game object
 // Note: when this function returns, the tanks have NOT been created yet
-var buildAllTanks = function(self, nTanksPerPlayer) {
+var buildAllTanks = function(nTanksPerPlayer) {
+	var self = this;
+	this.tanks = [];
 	sessions.runOnAllSessions(function(sess) {
 		// sess = session of one of the player
 		// sess.id = unique id for this player
@@ -55,13 +72,40 @@ var sendTanks = function() {
 	});
 };
 
+// send an update/change of the map to all client browsers
+var sendMapToClients = function(sess, arX, arV) {
+	var self = this;
+	nowjs.getClient(sess.id, function () {
+		// Note: this = "now client data"
+		var md = self.map.mapData;
+		if (this.now) {
+			if (this.now.defineMap) {
+				// Note: FireFox takes a rather LONG time to send the map data, and sometimes it doesn't get there
+				// Note: continue sending the entire map to the client, until the client replies: "gotMap"
+				if (!this.now.mapSent) this.now.mapSent = 0;
+				this.now.mapSent++;
+				if (this.now.mapSent < 10 || !this.now.gotMap) {
+					console.log("GAME: calling defineMap for "+sess.id+".   mapSent="+this.now.mapSent+".   md.width="+md.width);
+					this.now.defineMap(md);
+					self.sendTanks();
+				}
+			}
+			if (this.now.updateMap) {
+				this.now.updateMap(arX, arV);
+			}
+		}
+	});
+};
+
+
+
 // startup the main game loop
 var intervalKey = undefined;
 var startGameLoop = function() {
 	var self = this;
 	if (!intervalKey) {
 		intervalKey = setInterval(function() {
-			// Time to update the game
+			// Time to update the game for 1 frame
 
 			// @TODO: calculate elapsed ms per frame (for now, just hardcode a guess of 50)
 			var msElapsed = 50;
@@ -103,7 +147,7 @@ var startGameLoop = function() {
 		
 			// send map changes to all clients/browser/actors
 			sessions.runOnAllSessions(function(sess) {
-				sendMapToClients(self,sess,arX, arV);
+				self.sendMapToClients(sess,arX, arV);
 			});
 		}, 50);	// 500ms = 2/second.  50=20/second
 	}
@@ -112,44 +156,23 @@ var startGameLoop = function() {
 
 
 
-// send an update/change of the map to all client browsers
-var sendMapToClients = function(self, sess, arX, arV) {
-	nowjs.getClient(sess.id, function () {
-		var md = self.map.mapData;
-		if (this.now) {
-			if (this.now.defineMap) {
-				// Note: FireFox takes a rather LONG time to send the map data, and sometimes it doesn't get there
-				// Note: continue sending the entire map to the client, until the client replies: "gotMap"
-				if (!this.now.mapSent) this.now.mapSent = 0;
-				this.now.mapSent++;
-				if (this.now.mapSent < 10 || !this.now.gotMap) {
-					console.log("calling defineMap for "+sess.id+".   mapSent="+this.now.mapSent+".   md.width="+md.width);
-					this.now.defineMap(md);
-					self.sendTanks();
-				}
-			}
-			if (this.now.updateMap) {
-				this.now.updateMap(arX, arV);
-			}
-		}
-	});
-};
-
-
+// constructor to create a whole new game
 var newGame = (function() {
 	// constructor
 	// create a new Game, given a world-map-width (width)
 	return function(width) {
 		// DATA
 		this.tanks = [];									// array of tanks
-		this.map = new mapConstructor.newMap(width);		// create a new map that is N pixels wide
+		this.map;											// THE map of the world
 
 		// METHODS
-		this.startGameLoop = startGameLoop;
+		this.init = init;									// initialize a whole new game
+		this.buildTheMap = buildTheMap;
+		this.buildAllTanks = buildAllTanks;
+		this.startGameLoop = startGameLoop;					// startup the main game loop
 		this.sendTanks = sendTanks;							// initial send all tank data to all clients
 		this.updateTanks = updateTanks;						// update all tanks for N ms
-
-		buildAllTanks(this, 3);								// build N tanks per client
+		this.sendMapToClients = sendMapToClients;
 
 		return this;
 	};
