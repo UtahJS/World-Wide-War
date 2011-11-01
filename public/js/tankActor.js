@@ -19,13 +19,12 @@ WAR.TankActor = function(x,y) {
 WAR.TankActor.prototype= {
 
 	// data
-	x: 30,		// position
+	x: 30,				// position
 	y: 30,
-	user: 0,	// player that owns this tank
+	user: 0,			// player that owns this tank
 	width: 64,
 	height: 64,
-		
-		
+	selected: false,	// true means this is the currently selected tank for THIS user
 
 	// initialize the tank object
 	init: function(x,y) {
@@ -65,6 +64,9 @@ WAR.TankActor.prototype= {
 		// just draw something for testing
         if ( null!==this.fillStyle ) {
             ctx.fillStyle= this.fillStyle;
+            if (this.selected) {
+            	ctx.fillStyle = 'rgb(255,255,100)';
+            }
             ctx.beginPath();
             ctx.arc( this.width/2, this.height/2, Math.min(this.width,this.height)/2, 0, 2*Math.PI, false );
             ctx.fill();
