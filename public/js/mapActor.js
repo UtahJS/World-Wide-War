@@ -38,6 +38,11 @@ WAR.MapActor.prototype= {
 		
 	},
 	
+	// reset the map (game over)
+	resetGame: function() {
+		this.mapData = null;
+	},
+	
 	/**
 	 * define/set the entire map data object (see map.js on server)
 	 */

@@ -114,7 +114,7 @@ var processOneLoop = function(msElapsed) {
 	this.sendInitialStateToAllClients(msElapsed);
 	
 	// @TODO: determine if the game is over
-	if (this.msTotalElapsed > 10000) {			// let play for 10 second, then quit (DEBUG)
+	if (this.msTotalElapsed > 20000) {			// let play for 20 second, then quit (DEBUG)
 		this.gameOver = true;
 	}
 };
@@ -141,7 +141,7 @@ var startGameLoop = function() {
 					nowjs.getClient(sess.id, function () {
 						if (this.now) {
 							this.now.moveToStartScene();
-							// @TODO: reset all game data in the "now" space
+							this.now.resetGame();
 							this.now.gotMap = false;
 						}
 					});

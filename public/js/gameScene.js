@@ -76,6 +76,17 @@ WAR.createGameScene = function(director) {
 		}
 	};
 	
+	// remove all tanks from the game
+	var removeAllTanks = function() {
+		for(var id in tankData) {
+			if (tankData.hasOwnProperty(id)) {
+				var d = tankData[id];
+				scene.removeChild(d.actor);
+				tankData[id] = undefined;
+			}
+		}
+		tankData = [];
+	};
 
 
 	// - - - - - - - - - - - - - - - - - - -
@@ -104,6 +115,12 @@ WAR.createGameScene = function(director) {
 	// create a function the server can call to show something on browser console
 	now.logToClientConsole = function(msg) {
 		console.log("Message from Server: " + msg);
+	};
+
+	// create a function the server can call to reset the game data (delete all tanks and bullets)
+	now.resetGame = function() {
+		mapActor.resetGame();
+		removeAllTanks();
 	};
 
 	// create a function the server can call to define the entire map data
