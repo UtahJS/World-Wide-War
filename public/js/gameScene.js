@@ -112,13 +112,15 @@ WAR.createGameScene = function(director) {
 		} else if (keycode == 97 || keycode == 65) {
 			// "A" or "a" == "Move selected tank LEFT 3 Pixels"
 			if (td) {
-				now.queueAction(idt, {action:"move", x:td.x-3});
+				var newx = td.x - (keycode == 97? 3 : 15);
+				now.queueAction(idt, {action:"move", x:newx});
 			}
 			
 		} else if (keycode == 100 || keycode == 68) {
 			// "D" or "d" == "Move selected tank RIGHT 3 Pixels
 			if (td) {
-				now.queueAction(idt, {action:"move", x:td.x+3});
+				var newx = td.x + (keycode == 100? 3 : 15);
+				now.queueAction(idt, {action:"move", x:newx});
 			}
 			
 		}
