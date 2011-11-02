@@ -99,12 +99,21 @@ var sendInitialStateToAllClients = function(msElapsed) {
 	}
 };
 
+
 // part of the main game loop.  Process one game loop.
 // "msElapsed" milliseconds have elapsed since the last game loop was processed
 var processOneLoop = function(msElapsed) {
-	var self = this;
+	var self = this,
+		i,
+		action;
 	// Time to update the game for 1 frame
 	
+	// process user-requested actions
+	for(i=0; i<this.actions.length; i++) {
+		action = this.actions[i];
+		this.processOneAction(action);
+	}
+	this.actions = []
 	
 	// allow everything to "process time"
 	this.updateTanks(msElapsed);				// move tanks (and send data to all clients)
@@ -160,6 +169,7 @@ var newGame = (function() {
 	// create a new Game, given a world-map-width (width)
 	return function(width) {
 		// DATA
+		this.actions = [];									// queue of actions requested by users to do
 		this.tanks = [];									// array of tanks
 		this.map;											// THE map of the world
 
@@ -171,6 +181,47 @@ var newGame = (function() {
 		this.startGameLoop = startGameLoop;					// startup the main game loop
 		this.updateTanks = updateTanks;						// update all tanks for N ms
 		this.sendInitialStateToAllClients = sendInitialStateToAllClients;
+
+
+		this.findTankByID = function(tankID) {
+			for(var i=0; i<this.tanks.length; i++) {
+				var td = this.tanks[i];
+				if (td.id === tankID) return td;
+			}
+			return null;
+		};
+
+		// a user has requested to perform an action
+		this.queueAction = function(userID, tankID, action) {
+			var td = this.findTankByID(tankID);
+			if (td && td.user != userID) {
+				tankID = null;					// wrong user trying to move a tank they don't own
+				td = null;
+			}
+			action.tankID = tankID;
+			action.userID = userID;
+			this.actions.push(action);
+		};
+		
+		// process one action right now
+		// @param {object} obj
+		// @config {string} .action = WHAT to do ("move")
+		// @config {number} .x		= X location to try to move to
+		this.processOneAction = function(obj) {
+			if (obj && obj.action) {
+				var td = this.findTankByID(obj.tankID);
+				if (td) {
+					// PROCESS ACTIONS THAT REQUIRE A VALID TANK
+					if (obj.action == "move") {
+						this.processAction_move(td, obj);
+					}
+				}
+				// PROCESS ACTIONS THAT DO NOT NEED A TANK
+			}
+		};
+		this.processAction_move = function(td, obj) {
+			td.setxWanted(obj.x);
+		};
 
 		return this;
 	};

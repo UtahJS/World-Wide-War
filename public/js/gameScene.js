@@ -100,10 +100,27 @@ WAR.createGameScene = function(director) {
         }else if(e) {
             keycode = e.which;
         }
-		//console.log("Key pressed: keycode="+keycode);
-		// "N" or "n" == "Select Next Tank"
+		// console.log("Key pressed: keycode="+keycode);
+		
+		var idt = getSelectedTankID();		// id of current selected tank
+		var td = tankData[idt];				// tank data
+
 		if (keycode == 110 || keycode == 78) {
+			// "N" or "n" == "Select Next Tank"
 			selectNextTank();
+
+		} else if (keycode == 97 || keycode == 65) {
+			// "A" or "a" == "Move selected tank LEFT 3 Pixels"
+			if (td) {
+				now.queueAction(idt, {action:"move", x:td.x-3});
+			}
+			
+		} else if (keycode == 100 || keycode == 68) {
+			// "D" or "d" == "Move selected tank RIGHT 3 Pixels
+			if (td) {
+				now.queueAction(idt, {action:"move", x:td.x+3});
+			}
+			
 		}
 	};
 

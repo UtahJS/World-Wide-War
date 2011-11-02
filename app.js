@@ -79,6 +79,15 @@ everyone.now.startGame = function() {
 	});
 };
 
+// When any user wants to perform any action, then call this function (like "move my tank#3 left 3 pixels")
+everyone.now.queueAction = function(tankID, action) {
+	if (myGame && this.user && this.user.clientId) {
+		// pass in the "userID" (session id)
+		tankID = parseInt(tankID);
+		myGame.queueAction(this.user.clientId, tankID, action);
+	}
+};
+
 // initialize + configuration
 
 // *** PUBLISH TO CLIENT: debug log function (allow client to record log messages on the server console)
