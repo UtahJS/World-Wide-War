@@ -62,7 +62,7 @@ nowjs.on('connect', function() {
 	sessions.createSessionViaNow(this.user);
 	sessions.runOnAllSessions(function(sess) {
 		nowjs.getClient(sess.id, function () {
-			if (this.now) {
+			if (this.now && this.now.updatePlayerCount) {
 				this.now.updatePlayerCount(sessions.countSessions());
 			}
 		});
@@ -72,7 +72,7 @@ nowjs.on('disconnect', function() {
 	sessions.deleteSessionViaNow(this.user);
 	sessions.runOnAllSessions(function(sess) {
 		nowjs.getClient(sess.id, function () {
-			if (this.now) {
+			if (this.now && this.now.updatePlayerCount) {
 				this.now.updatePlayerCount(sessions.countSessions());
 			}
 		});

@@ -59,9 +59,10 @@ WAR.TankActor.prototype= {
      drawTank: function(ctx, posX, posY, angle) {
         
         ctx.save();
-        ctx.translate(posX,posY);
-        
         var scale = this.width / 100;
+        ctx.translate(posX,posY);
+        ctx.scale(scale,scale);
+        
         var posX = posX;
         var posY = posY;
         var angle = angle;
@@ -73,19 +74,19 @@ WAR.TankActor.prototype= {
         // Go to the starting position
         ctx.moveTo(posX, posY);
 
-        ctx.scale(scale,scale);
         ctx.lineWidth = 3;
 
         // ========== CANNON ============ //
-
+		ctx.save();
+		ctx.translate(50,50);
         ctx.beginPath();
-        ctx.moveTo(50,50);
-        ctx.lineTo(98,50);
+        ctx.moveTo(0,0);
+        ctx.lineTo(48,0);
 
         ctx.lineWidth = 11;
         ctx.strokeStyle = cannonColor;
         ctx.stroke();
-
+		ctx.restore();
         // ========== BUBBLE ============ //
 
         ctx.beginPath();
