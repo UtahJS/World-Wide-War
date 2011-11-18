@@ -60,9 +60,23 @@ var startNewGame = function() {
 nowjs.on('connect', function() {
 	var id = this.user.clientId;
 	sessions.createSessionViaNow(this.user);
+	sessions.runOnAllSessions(function(sess) {
+		nowjs.getClient(sess.id, function () {
+			if (this.now) {
+				this.now.updatePlayerCount(sessions.countSessions());
+			}
+		});
+	});
 });
 nowjs.on('disconnect', function() {
 	sessions.deleteSessionViaNow(this.user);
+	sessions.runOnAllSessions(function(sess) {
+		nowjs.getClient(sess.id, function () {
+			if (this.now) {
+				this.now.updatePlayerCount(sessions.countSessions());
+			}
+		});
+	});
 });
 
 // When anyone clicks "Start Game", this function is called
@@ -78,6 +92,11 @@ everyone.now.startGame = function() {
 		});
 	});
 };
+
+everyone.now.getNumberOfPlayers = function() {
+	console.log(sessions.countSessions());
+	return sessions.countSessions();
+}
 
 // When any user wants to perform any action, then call this function (like "move my tank#3 left 3 pixels")
 everyone.now.queueAction = function(tankID, action) {

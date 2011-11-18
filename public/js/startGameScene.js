@@ -77,6 +77,24 @@
 	    };
 	    scene.addChild(button);
 	
+		var getNumPlayers = function() {
+			var n = '?';
+			if (now && now.getNumberOfPlayers) {
+				n = now.getNumberOfPlayers() || '??';
+			}
+			return n;
+		};
+	    var text = new CAAT.TextActor().
+                setFont("20px sans-serif").
+                setText("Waiting to play: " + getNumPlayers()).
+                calcTextSize(director);
+
+		now.updatePlayerCount = function(numPlayers) {
+			text.setText('Waiting to play: ' + numPlayers);
+		};
+
+        scene.addChild(text.setLocation(100, 100));
+	
 	};
 
 
