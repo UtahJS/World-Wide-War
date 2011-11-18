@@ -47,7 +47,7 @@ WAR.TankActor.prototype= {
 	},
 	
 	moveTank: function(x,y) {
-		var worldHeight = 600;
+		var worldHeight =  600;
 		this.x = x - this.width/2;
 		this.y = worldHeight - y - this.height;
 		this.setLocation(this.x, this.y);
