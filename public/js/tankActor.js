@@ -41,8 +41,16 @@ WAR.TankActor.prototype= {
 	 * @config .y
 	 */
 	updateTank: function(td) {
-		this.x = td.x;
-		this.y = td.y;
+//		var worldHeight = 600;
+//		this.x = td.x;// - this.width/2;;
+//		this.y = td.y;//worldHeight - td.y;
+	},
+	
+	moveTank: function(x,y) {
+		var worldHeight = 600;
+		this.x = x - this.width/2;
+		this.y = worldHeight - y - this.height;
+		this.setLocation(this.x, this.y);
 	},
 
     /**

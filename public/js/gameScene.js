@@ -179,10 +179,11 @@ WAR.createGameScene = function(director) {
 				if (tankData[d.id]) {
 					// KNOWN TANK
 					var tank = tankData[d.id];			// passed in tank data
+					tank.actor.moveTank(d.x, d.y);
 					tank.x = d.x;
 					tank.y = d.y;
-					var actor = tank.actor;				// CAAT actor for this tank
-					actor.setLocation(d.x, d.y);
+//					var actor = tank.actor;				// CAAT actor for this tank
+//					actor.setLocation(d.x, d.y);
 				} else {
 					// NEW TANK
 					tankData[d.id] = d;
