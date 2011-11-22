@@ -20,6 +20,7 @@ WAR.MapActor.prototype= {
 
 		// Map Data
 		mapData: null,			// see map.js   ...   {data:[ ],  width:1000}
+		mapShift: 0,			// N pixels map is shifted (+10 means 10 pixels to the right)
 		
 		// frames-per-second variables
 		fpsLast: 0,				// frames-per-second last second
@@ -96,35 +97,72 @@ WAR.MapActor.prototype= {
 		
 		// ** Paint this actor **
         var ctx= director.crc;
+        ctx.save();
+        ctx.translate(0,0);
 
 		// paint some cute background goo
         if ( null!==this.fillStyle ) {
-            ctx.fillStyle= this.fillStyle;
-            ctx.beginPath();
-            ctx.arc( this.width/2, this.height/2, Math.min(this.width,this.height)/2, 0, 2*Math.PI, false );
-            ctx.fill();
+        	for(var qqq=0; qqq<2; qqq++) {
+				ctx.save();
+				var tx = -this.mapShift;
+				if (this.mapData && this.mapData.width) {
+					tx += qqq * this.mapData.width;
+					if (this.mapData.width > this.width * 2) {
+						tx = tx / 2;							// make this paralax scrolling (IF map is wide enough)
+					}
+				}
+				ctx.translate(tx,0);
+				ctx.fillStyle= this.fillStyle;
+				ctx.beginPath();
+				ctx.arc( this.width/2, this.height/2, Math.min(this.width,this.height)/2, 0, 2*Math.PI, false );
+				ctx.fill();
+				ctx.restore();
+			}
         }
 
 		// paint the map (NOTE: Map data is sent to this client from the server)
 		if (this.mapData && this.mapData.data) {
 			var map = this.mapData.data;
+			var xScrn = 0;						// Screen X to paint next
+			var xMap = this.mapShift;			// Map X to paint at xScrn next
 	        ctx.beginPath();
-			ctx.moveTo(0,this.height);
+			ctx.moveTo(xScrn,this.height);
 			var nStop = this.width < this.mapData.width ? this.width : this.mapData.width;
-	        for(var x=0; x<nStop; x++) {
-				ctx.lineTo(x,this.height-map[x]);
+	        while(xScrn<this.width) {
+				ctx.lineTo(xScrn,this.height-map[xMap]);
+				xScrn += 1;
+				xMap += 1;
+				if (xMap >= this.mapData.width) {
+					xMap -= this.mapData.width;
+				}
 	        }
 			ctx.lineTo(this.width, this.height);
 	        ctx.fillStyle= 'rgb(100,120,100)';
 			ctx.fill();
 		}
 		
+		ctx.restore();
 		// paint debug frames-per-second
 		ctx.fillStyle = "rgb(0,0,0)";
 		ctx.fillText("FPS: "+this.fpsLast+".   ms elapsed="+msElapsed, 4,this.height-6);
 		ctx.fillStyle = "rgb(255,255,255)";
 		ctx.fillText("FPS: "+this.fpsLast+".   ms elapsed="+msElapsed, 5,this.height-5);
+    },
+    
+    // shift the map right/left N pixels
+    shift: function(n) {
+    	n = -n;
+    	if (this.mapData && this.mapData.width) {
+	    	this.mapShift += n;
+	    	if (this.mapShift >= this.mapData.width) {
+	    		this.mapShift -= this.mapData.width;
+	    	} else if (this.mapShift < 0) {
+	    		this.mapShift += this.mapData.width;
+	    	}
+	    }
+	    return this.mapShift;
     }
+
 };
 
 extend( WAR.MapActor, CAAT.ActorContainer, null);

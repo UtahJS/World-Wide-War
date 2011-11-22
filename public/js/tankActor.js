@@ -25,6 +25,8 @@ WAR.TankActor.prototype= {
 	width: 50,
 	height: 50,
 	selected: false,	// true means this is the currently selected tank for THIS user
+	tankShift: 0,		// amount the entire world has been shifted
+	mapWidth: 0,		// world map width
 
 	// initialize the tank object
 	init: function(x,y) {
@@ -41,16 +43,16 @@ WAR.TankActor.prototype= {
 	 * @config .y
 	 */
 	updateTank: function(td) {
-//		var worldHeight = 600;
-//		this.x = td.x;// - this.width/2;;
-//		this.y = td.y;//worldHeight - td.y;
 	},
 	
 	moveTank: function(x,y) {
 		var worldHeight =  600;
 		this.x = x - this.width/2;
 		this.y = worldHeight - y - this.height;
-		this.setLocation(this.x, this.y);
+		var tx = this.x + this.tankShift;
+		if (tx > this.mapWidth) tx -= this.mapWidth;
+		if (tx < -this.width) tx += this.mapWidth;
+		this.setLocation(tx, this.y);
 	},
 
 
@@ -152,16 +154,10 @@ WAR.TankActor.prototype= {
 
 		// just draw something for testing
 		this.drawTank(ctx, 0,0, 0);
-/*        if ( null!==this.fillStyle ) {
-            ctx.fillStyle= this.fillStyle;
-            if (this.selected) {
-            	ctx.fillStyle = 'rgb(255,255,100)';
-            }
-            ctx.beginPath();
-            ctx.arc( this.width/2, this.height/2, Math.min(this.width,this.height)/2, 0, 2*Math.PI, false );
-            ctx.fill();
-        }
-*/
+    },
+    
+    setShift: function(n) {
+    	this.tankShift = n;
     }
 };
 

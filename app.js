@@ -49,7 +49,7 @@ everyone = nowjs.initialize(app);
 // *** Start a new game !!
 var startNewGame = function() {
 	var nPlayers = sessions.countSessions();		// total players going to play this game
-	var nWide = 500 + nPlayers * 300;				// world width
+	var nWide = 1500 + nPlayers * 300;				// world width
 	var nTanksPerPlayer = 3;						// tanks per player
 	myGame = new gameConstructor.newGame();			// create a game with a map of N pixels wide
 	myGame.init(nWide, nTanksPerPlayer);			// initialize the game

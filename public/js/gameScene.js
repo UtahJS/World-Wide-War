@@ -88,6 +88,28 @@ WAR.createGameScene = function(director) {
 		tankData = [];
 	};
 
+	// scroll the entire world right/left N pixels (- = left, + = right)
+	var scrollScreen = function(n) {
+		var mapShift = mapActor.shift(n);
+		for(var id in tankData) {
+			if (tankData.hasOwnProperty(id)) {
+				var d = tankData[id];
+				d.actor.setShift(-mapShift);
+			}
+		}
+	};
+	
+	var updateAllTanks = function() {
+		if (mapActor && mapActor.mapData) {
+			var mapWidth = mapActor.mapData.width;
+			for(var id in tankData) {
+				if (tankData.hasOwnProperty(id)) {
+					var d = tankData[id];
+					d.actor.mapWidth = mapWidth;
+				}
+			}
+		}
+	};
 
 	// - - - - - - - - - - - - - - - - - - -
 	// FUNCTIONS TO HANDLE USER INPUT EVENTS	
@@ -123,6 +145,13 @@ WAR.createGameScene = function(director) {
 				now.queueAction(idt, {action:"move", x:newx});
 			}
 			
+		} else if (keycode == 91) {
+			// "[" == "Shift screen left"
+			scrollScreen(-10);
+			
+		} else if (keycode == 93) {
+			// "]" == "Shift screen right"
+			scrollScreen(10);			
 		}
 	};
 
@@ -145,7 +174,8 @@ WAR.createGameScene = function(director) {
 	// create a function the server can call to define the entire map data
 	now.defineMap = function(md) {
 		if (md && md.width) {
-			now.gotMap = true;
+			now.gotMap = true;			// kludge: signal back to the server that I got the map data
+			updateAllTanks();
 		}
 		mapActor.defineMap(md);
 	};
@@ -168,6 +198,7 @@ WAR.createGameScene = function(director) {
 				}
 			}
 		}
+		updateAllTanks();
 	};
 	
 	// create a function the server can call to update tanks info (position, facing ...)
