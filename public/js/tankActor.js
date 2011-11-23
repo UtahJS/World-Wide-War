@@ -11,8 +11,6 @@
 WAR.TankActor = function(x,y) {
     CAAT.ShapeActor.superclass.constructor.call(this);
 
-	this.init(x,y);
-
     return this;
 };
 
@@ -21,18 +19,24 @@ WAR.TankActor.prototype= {
 	// data
 	x: 30,				// position
 	y: 30,
+	powerMax: 0,		// maximum power tank can reach
+	power: 0,			// current power tank has available
 	user: 0,			// player that owns this tank
 	width: 50,
 	height: 50,
+	marginBottom: 10,	// extra margin below tank
 	selected: false,	// true means this is the currently selected tank for THIS user
 	tankShift: 0,		// amount the entire world has been shifted
 	mapWidth: 0,		// world map width
 
 	// initialize the tank object
-	init: function(x,y) {
-		this.x = x;
-		this.y = y;
-		this.setBounds(this.x,this.y,this.width,this.height);          // set tank initial position and size
+	init: function(td) {
+		this.x = td.x;
+		this.y = td.y;
+		this.powerMax = td.powerMax;
+		this.power = td.power;
+		console.log("Tank:  powerMax="+this.powerMax+"  power="+this.power);
+		this.setBounds(this.x,this.y,this.width,this.height+this.marginBottom);          // set tank initial position and size
 		this.setFillStyle('rgb(200,200,255)');     // primary fill color for the tank
 	},
 	
@@ -45,13 +49,15 @@ WAR.TankActor.prototype= {
 	updateTank: function(td) {
 	},
 	
-	moveTank: function(x,y) {
+	moveTank: function(d) {
 		var worldHeight =  600;
-		this.x = x - this.width/2;
-		this.y = worldHeight - y - this.height;
+		this.x = d.x - this.width/2;
+		this.y = worldHeight - d.y - this.height + this.marginBottom;
 		var tx = this.x + this.tankShift;
 		if (tx > this.mapWidth) tx -= this.mapWidth;
 		if (tx < -this.width) tx += this.mapWidth;
+		if (d.powerMax) this.powerMax = d.powerMax;
+		if (d.power !== undefined) this.power = d.power;
 		this.setLocation(tx, this.y);
 	},
 
@@ -131,6 +137,16 @@ WAR.TankActor.prototype= {
         ctx.beginPath();
         ctx.arc(77,80,11,0,Math.PI*2,false);
         ctx.fill();
+
+        // ========== POWER GAUGE ============ //
+        var yy = 110;
+        ctx.strokeStyle = "#8080ff";
+        ctx.lineWidth = 10;
+        ctx.beginPath();
+		ctx.moveTo(0, yy);
+		var p = this.power / this.powerMax;		// percentage of power left
+		ctx.lineTo(100*p, yy);
+		ctx.stroke();
 
         ctx.restore();
       },

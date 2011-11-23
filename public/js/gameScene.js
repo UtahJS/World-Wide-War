@@ -193,7 +193,8 @@ WAR.createGameScene = function(director) {
 				if (!tankData[d.id]) {
 					// NEW TANK
 					tankData[d.id] = d;
-					d.actor = new WAR.TankActor(d.x,d.y);
+					d.actor = new WAR.TankActor();
+					d.actor.init(d);
 					scene.addChild(d.actor);
 				}
 			}
@@ -210,7 +211,7 @@ WAR.createGameScene = function(director) {
 				if (tankData[d.id]) {
 					// KNOWN TANK
 					var tank = tankData[d.id];			// passed in tank data
-					tank.actor.moveTank(d.x, d.y);
+					tank.actor.moveTank(d);
 					tank.x = d.x;
 					tank.y = d.y;
 //					var actor = tank.actor;				// CAAT actor for this tank
@@ -218,7 +219,8 @@ WAR.createGameScene = function(director) {
 				} else {
 					// NEW TANK
 					tankData[d.id] = d;
-					d.actor = new WAR.TankActor(d.x,d.y);
+					d.actor = new WAR.TankActor();
+					d.actor.init(d);
 					scene.addChild(d.actor);
 				}
 			}
