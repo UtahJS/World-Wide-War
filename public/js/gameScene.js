@@ -111,6 +111,37 @@ WAR.createGameScene = function(director) {
 		}
 	};
 
+	// - - - - - - - - - - - - - - - - - - - - - - -
+	// FUNCTIONS TO HANDLE THE MAIN CLIENT GAME LOOP
+	
+	// THE main game loop
+	// msElapsed = total ms elapsed since previous game loop
+	var gameLoop = function(msElapsed) {
+		//console.log("Game timer: "+msElapsed);
+		// elapse time for every tank (increase power ...)
+		for(var id in tankData) {
+			if (tankData.hasOwnProperty(id)) {
+				var d = tankData[id];
+				d.actor.elapseTime(msElapsed);
+			}
+		}		
+	};
+	// create THE game timer
+	var lastTimerValue = 0;
+	scene.createTimer(
+		0,
+		Number.MAX_VALUE,
+		function(scene_time, timer_time, timertask_instance)  {   // timeout
+		},
+		function(scene_time, timer_time, timertask_instance)  {   // tick
+			gameLoop(timer_time-lastTimerValue);
+			lastTimerValue = timer_time;
+		},
+		function(scene_time, timer_time, timertask_instance)  {   // cancel
+		}
+	);
+ 
+
 	// - - - - - - - - - - - - - - - - - - -
 	// FUNCTIONS TO HANDLE USER INPUT EVENTS	
 	
@@ -211,7 +242,7 @@ WAR.createGameScene = function(director) {
 				if (tankData[d.id]) {
 					// KNOWN TANK
 					var tank = tankData[d.id];			// passed in tank data
-					tank.actor.moveTank(d);
+					tank.actor.updateTank(d);
 					tank.x = d.x;
 					tank.y = d.y;
 //					var actor = tank.actor;				// CAAT actor for this tank

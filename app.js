@@ -77,6 +77,10 @@ nowjs.on('disconnect', function() {
 			}
 		});
 	});
+	// if no sessions, stop all games
+	if (sessions.countSessions() <= 0 && myGame) {
+		myGame.gameOver = true;
+	}
 });
 
 // When anyone clicks "Start Game", this function is called

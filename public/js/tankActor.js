@@ -35,7 +35,6 @@ WAR.TankActor.prototype= {
 		this.y = td.y;
 		this.powerMax = td.powerMax;
 		this.power = td.power;
-		console.log("Tank:  powerMax="+this.powerMax+"  power="+this.power);
 		this.setBounds(this.x,this.y,this.width,this.height+this.marginBottom);          // set tank initial position and size
 		this.setFillStyle('rgb(200,200,255)');     // primary fill color for the tank
 	},
@@ -46,10 +45,7 @@ WAR.TankActor.prototype= {
 	 * @config .x
 	 * @config .y
 	 */
-	updateTank: function(td) {
-	},
-	
-	moveTank: function(d) {
+	updateTank: function(d) {
 		var worldHeight =  600;
 		this.x = d.x - this.width/2;
 		this.y = worldHeight - d.y - this.height + this.marginBottom;
@@ -59,6 +55,17 @@ WAR.TankActor.prototype= {
 		if (d.powerMax) this.powerMax = d.powerMax;
 		if (d.power !== undefined) this.power = d.power;
 		this.setLocation(tx, this.y);
+	},
+	
+	/**
+	 * process ms milliseconds elapsed
+	 */
+	elapseTime: function(msElapsed) {
+		// NOTE: This is a client-side estimate of the real server value
+		this.power += 10 * msElapsed / 1000;		// 10 power per second
+		if (this.power > this.powerMax) {
+			this.power = this.powerMax;
+		}
 	},
 
 
